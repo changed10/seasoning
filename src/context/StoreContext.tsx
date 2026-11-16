@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -69,6 +70,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [stamps, setStamps] = useState<Record<RegionId, boolean>>(() =>
     readStamps(),
   )
+  const cartRef = useRef(cart)
+  const stampsRef = useRef(stamps)
+  cartRef.current = cart
+  stampsRef.current = stamps
 
   useEffect(() => {
     localStorage.setItem(CART_KEY, JSON.stringify(cart))
@@ -113,9 +118,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const completeOrder = useCallback(() => {
     const earned: RegionId[] = []
     const alreadyHad: RegionId[] = []
-    const next = { ...stamps }
+    const next = { ...stampsRef.current }
 
-    for (const item of cart) {
+    for (const item of cartRef.current) {
       const product = getProduct(item.productId)
       if (!product) continue
       if (next[product.regionId]) {
@@ -133,7 +138,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setStamps(next)
     setCart([])
     return { earned, alreadyHad }
-  }, [cart, stamps])
+  }, [])
 
   const cartCount = useMemo(
     () => cart.reduce((sum, item) => sum + item.quantity, 0),
