@@ -21,6 +21,7 @@ export function Layout() {
 
   useEffect(() => {
     setSearchOpen(false)
+    setToast('')
   }, [location.pathname])
 
   useEffect(() => {
@@ -47,7 +48,11 @@ export function Layout() {
           hideActions={location.pathname.startsWith('/order-complete')}
         />
         <div className={`phone-scroll${hideNav ? ' no-nav' : ''}`}>
-          <Outlet context={{ notify: (name: string) => setToast(`${name}을(를) 담았어요`) }} />
+          <Outlet
+            context={{
+              notify: (name: string) => setToast(`${name} 담았어요`),
+            }}
+          />
         </div>
         {!hideNav && <BottomNav />}
         {searchOpen && <SearchSheet onClose={() => setSearchOpen(false)} />}
